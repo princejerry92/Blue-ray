@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2 Dashboard</title>
+    <!-- Include Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('../static/img/assets/darkbackground.jpg') no-repeat center center / cover;
+        }
+        
+        /* Modal, Dropdown, and File Icon Styling */
+        
+        #file2 {
+            margin-right: 6rem;
+        }
+
+        #file {
+            margin-left: 6rem;
+        }
+
+        #open {
+            margin-left: 8rem;
+        }
+        #examDetails {
+            max-height: 400px;  /* Ensure it doesn't overflow the modal */
+            overflow-y: auto;  /* Allow scrolling if content exceeds height */
+            padding: 10px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #333;  /* Ensure text color contrasts with background */
+        }
+        
+        #examDetails ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        #resultStatus{
+            color:antiquewhite
+        }
+        
+        #examDetails li {
+            margin-bottom: 8px;  /* Space out list items */
+        }
+        
+
+        .file-icon {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-icon.selected {
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+            border-radius: 8px;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: #be4f4f;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            box-shadow: inset -2.41px 0.97px 3.38px -0.42px rgba(13, 12, 12, 0.15),
+  inset 3.62px -1.45px 3.38px -0.42px rgba(13, 12, 12, 0.3),
+  -7.24px 2.90px 2.54px -1.27px rgba(13, 12, 12, 0.6);
+  color: #ffff;
+  border-radius: 14px;
+      
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 30px;
+            box-shadow: inset -2.41px 0.97px 3.38px -0.42px rgba(13, 12, 12, 0.15),
+  inset 3.62px -1.45px 3.38px -0.42px rgba(13, 12, 12, 0.3),
+  -7.24px 2.90px 2.54px -1.27px rgba(13, 12, 12, 0.6);
+  transition: opacity 0.5s ease-in, visibility 0.5s ease-in;
+  
+        }
+
+        .modal-content {
+            background-color: #682222;
+            margin: 15% auto;
+            padding: 20px;
+            /*border: 1px solid #888;*/
+            width: 80%;
+            border-radius: 14px;
+            max-width: 500px;
+            color: rgb(182, 180, 176);
+            box-shadow: inset -2.41px 0.97px 3.38px -0.42px rgba(13, 12, 12, 0.15),
+  inset 3.62px -1.45px 3.38px -0.42px rgba(13, 12, 12, 0.3),
+  -7.24px 2.90px 2.54px -1.27px rgba(13, 12, 12, 0.6);
+  transition: opacity 0.3s ease-in, visibility 0.3s ease-in;
+  
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #downloadAnimation {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #ipInput {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #resultStatus{
+            color: antiquewhite;
+            border-radius: 14px;
+            display: block;
+        }
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        #progressBar {
+            width: 80%;
+            height: 20px;
+            border-radius: 10px;
+            border: none;
+            background-color: #ddd;
+            padding: 0;
+        }
+        
+        #progressBar::-webkit-progress-bar {
+            background-color: #ddd;
+            border-radius: 10px;
+        }
+        
+        #progressBar::-webkit-progress-value {
+            background-color: #337ab7;
+            border-radius: 10px;
+        }
+        #connectionStatus{
+            color:grey;
+            font-weight: 400;
+            display: none;
+        }
+
+        
+        #progressPercentage {
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .update-progress {
+            transition: width 0.3s ease-in-out;
+        }
+
+        .dropdown button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .socket-event-icon {
+            display: none;
+            animation: pulse 1s infinite;
+            margin-left: 10px;
+        }
+        #resultModal{
+            color: #f1f1f1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        /* From Uiverse.io by d4niz */ 
+.loader {
+    width: 46px;
+    height: 46px;
+    display: none;
+    border: 4.6px solid #0000;
+    border-radius: 100%;
+    border-color: #00ff1e #0000;
+    animation: spinner-e04l1k 1s infinite linear;
+  }
+  
+  .loader::before, .loader::after {
+    content: "";
+    margin: 8px;
+    grid-area: 1/1;
+    border: inherit;
+    border-radius: 50%;
+  }
+  
+  .loader::before {
+    border-color: #04e622 #0000;
+    animation: inherit;
+    animation-duration: 0.1s;
+  }
+  
+  .loader::after {
+    margin: 2.9px;
+  }
+  
+  @keyframes spinner-e04l1k {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="flex w-full max-w-5xl bg-gray-400 opacity-90 rounded-3xl shadow-2xl overflow-hidden flex h-svh">
+        <!-- Left Panel -->
+        <div class="w-1/3 bg-gray-900 p-6 space-y-4 relative">
+            <div class="flex items-center space-x-3 mb-8">
+                <img src="../static/img/assets/royal.jpg" alt="logo" class="w-10 h-10 rounded-full">
+                <span class="text-xl font-semibold">Admin 2</span>
+            </div>
+            <button class="w-full bg-gray-700 text-white rounded-full py-3 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                <span>Downloads</span>
+            </button>
+
+            <button class="w-full bg-gray-700 text-white rounded-full mt-2 py-3 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
+                    <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                </svg>
+                <span>View Results</span>
+            </button>
+
+            <button class="w-full bg-gray-700 text-white rounded-full mt-2 py-3 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+                <span>Connections</span>
+            </button>
+
+            <button type="button" class="w-full bg-gray-700 text-white rounded-full mt-2 py-3 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300"
+                onclick="location.href=  '{{ url_for('Timer_function') }}'">
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                </svg>
+                <span>Timer</span>
+            </button>
+
+            <button class="w-full bg-gray-700 text-white rounded-full mt-2 py-3 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300"
+            onclick="location.href=  '{{ url_for('subject') }}'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                </svg>
+                <span>Subject</span>
+            </button>
+        </div>
+
+
+        <!-- Right Panel -->
+        <div class="w-2/3 p-6 relative">
+            <div class="absolute top-6 right-6">
+                <button id="resultUploader" class="bg-orange-500 text-white rounded-full py-3 px-6 hover:bg-orange-600 transition duration-300">
+                    Upload Results
+                    <!-- Socket.IO Emit Event Indicator -->
+                    <svg id="emitEventIcon" class="socket-event-icon w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </button>
+                <input type="file" id="fileInput" style="display: none;">
+            </div>
+            <div class="mt-20 flex justify-between">
+                <div class="flex file-icon" id="file">
+                    <img src="../static/img/icons/folder.png" alt="folder" class="w-32 h-32">
+                </div>
+                <div class="flex file-icon" id="file2">
+                    <img src="../static/img/icons/folder.png" alt="folder" class="w-32 h-32">
+                </div>
+            </div>
+            <div class="mt-8"></div>
+                <button class="w-3/5 bg-blue-500 text-white rounded-full py-3 px-4 hover:bg-blue-600 transition duration-300" id="open">
+                    Start Exam
+                </button>
+            
+            
+
+            <input type="text" id="ipInput" placeholder="Enter host IP address" class="text-black">
+        </div>
+        <div class="loader" id="emitEventIcon"></div>
+
+    </div>
+           
+    <!-- Dropdown, Modals, and Icons -->
+    <!-- Dropdown Menu -->
+    <div id="dropdown" class="dropdown text-gray-700">
+        <button id="listBtn">List</button>
+        <button id="downloadBtn">Download</button>
+        <button id="renameBtn">Rename</button>
+        <button id="removeBtn">Remove</button>
+    </div>
+
+    <!-- List Modal -->
+    <div id="listModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Available Files</h2>
+            <ul id="fileList"></ul>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="errorTitle"></h2>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <!-- Download Animation -->
+    <div id="downloadAnimation">
+        <svg class="animate-bounce w-6 h-6 mb-3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+        <p>Downloading...</p>
+    </div>
+
+    <!-- Connection Modal -->
+    <div id="connectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="connectionStatus"></h2>
+            <div id="connectionIcon"></div>
+        </div>
+    </div>
+
+   <!-- progress Modal container -->
+<div class="modal" id="progress-modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <!-- Progress status and bar container -->
+      <div class="progress-container">
+      <div class="w-64 h-2 bg-gray-700 rounded-full overflow-hidden mt-4">
+        <div class="h-full bg-green-500" style="width: 50%;"></div>
+      </div>
+        <!-- Progress status text -->
+        <p id="progressStatus" class="progress-status text-green-400 text-xl">Sending...</p>
+        <!-- Progress bar -->
+        <div class="progress-bar-container rounded-md">
+          <progress id="progressBar" value="0" max="100"></progress>
+          <span id="progressPercentage" class="progress-percentage">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Result Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="resultStatus"></h2>
+            <div id="resultIcon"></div>
+        </div>
+    </div>
+
+     
+    <!--Details modal-->
+<div id="examModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" style="display:none;">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div id="examDetails">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button id="cancelExam" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Cancel
+            </button>
+            <button id="startExam" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            onclick="location.href=  '{{ url_for('examloader2') }}'">
+                Start Exam
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <!-- JavaScript: Add Emit Event Animation -->
+    
+    <!-- Include your external JavaScript files -->
+    <script src="{{ url_for('static', filename='Admin2viewer.js') }}"></script>
+    <script src="{{ url_for('static', filename='Admin2upload.js') }}"></script>
+    
+   
+</body>
+</html>

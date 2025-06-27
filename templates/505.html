@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>505 Internal Server Error</title>
+    <style>
+        body {
+            background-color: #212121;
+            color: #FFFFFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 500px;
+            padding: 20px;
+            background-color: #333;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .error-message {
+            font-size: 36px;
+            font-weight: bold;
+            color: #FF5252;
+            margin-bottom: 20px;
+        }
+
+        .error-description {
+            font-size: 18px;
+            color: #B0BEC5;
+            margin-bottom: 30px;
+        }
+
+        .error-image {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-retry {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #03A9F4;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-retry:hover {
+            background-color: #0288D1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-message">505 Internal Server Error</div>
+        <div class="error-description">
+            An unexpected error occurred on our server. 
+            Please try again later or contact support.
+        </div>
+        <img class="error-image" src="{{ url_for('static', filename='error-image.png') }}" alt="Error Image">
+        <br>
+        <a href="#" class="btn-retry" onclick="window.location.reload();">Try Again</a>
+    </div>
+</body>
+</html>

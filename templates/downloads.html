@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2 Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+</head>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: radial-gradient(circle at 50%, #1f2937, #111827);
+        color: #e5e7eb;
+    }
+    .glass-effect {
+        background: linear-gradient(145deg, #1f2937, #111827);
+        box-shadow: 10px 10px 30px #0e0f10, -10px -10px 30px #2a2f36;
+        border-radius: 12px;
+    }
+    .download-link:hover {
+        transform: translateX(10px);
+        transition: transform 0.3s ease-in-out;
+    }
+    .btn-hover {
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    .btn-hover:hover {
+        background-color: #10b981;
+        transform: scale(1.05);
+    }
+</style>
+<body class="min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-2xl mx-auto p-8 glass-effect">
+        <h1 class="text-4xl font-bold text-center mb-8">Download Files From Server</h1>
+        {% if message %}
+            <p class="text-lg text-red-500 text-center">{{ message }}</p>
+        {% else %}
+            <ul class="space-y-4">
+                {% for file, folder in files %}
+                    <li class="text-lg flex items-center">
+                        <span class="text-sm text-gray-400 mr-2">[{{ folder }}]</span>
+                        <a href="#" data-filename="{{ file }}" data-folder="{{ folder }}" class="download-link text-blue-400 hover:text-orange-500 font-semibold flex items-center">
+                            <i class="fas fa-file-download mr-2"></i>{{ file }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <!-- WebSocket status indicators -->
+        <div class="ws-status">
+            <img id="ws-connect" src="../static/img/assets/cloud-file.gif" alt="WebSocket connecting" style="display: none;">
+            <img id="ws-connected" src="../static/img/assets/Folder Access Allowed Animated 3D Icon.gif" alt="WebSocket connected" style="display: none;">
+            <img id="ws-disconnected" src="../static/img/assets/Caution Sign 3D Board Model.png" alt="WebSocket disconnected" style="display: none;">
+            <img id="ws-file-received" src="../static/img/assets/transfer-file.gif" alt="File received" style="display: none;">
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const downloadLinks = document.querySelectorAll('.download-link');
+
+            downloadLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent the default anchor click behavior
+
+                    const filename = this.getAttribute('data-filename');
+                    const folder = this.getAttribute('data-folder');
+                    
+                    // Construct the download URL
+                    const downloadUrl = `/download/${folder}/${filename}`;
+
+                    // Initiate the file download
+                    window.location.href = downloadUrl;
+                });
+            });
+        });
+    </script>
+    <script>
+        let socket;
+        
+        // Socket connection function
+        function connectToSocket() {
+            socket = io(`http://localhost:5000`, {
+                transports: ['websocket'],
+                reconnectionAttempts: 5,
+                reconnectionDelay: 6000
+            });
+            
+            socket.on('connect', () => {
+                console.log('Connected to admin server');
+                document.getElementById('ws-connect').style.display = 'none';
+                document.getElementById('ws-connected').style.display = 'block';
+            });
+            
+            socket.on('disconnect', () => {
+                console.log('Disconnected from admin server');
+                document.getElementById('ws-connected').style.display = 'none';
+                document.getElementById('ws-disconnected').style.display = 'block';
+            });
+            
+            // Listen for the 'file_received' event from the server
+            socket.on('file_received', function (data) {
+                if (data.status === 'success') {
+                    // File received, update UI
+                    new Audio('../static/img/assets/message-13716.mp3').play();
+                    console.log('File successfully received from the server.');
+                    document.getElementById('ws-file-received').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('ws-file-received').style.display = 'none';
+                    }, 3000);
+                }
+            });
+        }
+        
+        connectToSocket();
+    </script>
+</body>
+</html>

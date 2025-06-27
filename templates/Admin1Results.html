@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-bold-straight/css/uicons-bold-straight.css'>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css'>    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        #socketioConnect {
+            display: inline-block !important;
+            width: 2rem;
+            height: 2rem;
+            color: brown;
+            animation: spin 2s linear infinite;
+              }
+              
+              @keyframes spin {
+                0% {
+                  transform: rotate(0deg);
+                }
+                100% {
+                  transform: rotate(360deg);
+                }
+              }
+              /* Spinner Styles */
+              .loader {
+                  border-top-color: #3498db;
+                  animation: spin 1s infinite linear;
+              }
+              @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+              }
+              #envelope {
+                position: relative;
+              }
+              .badge {
+                position: relative;
+                top: 0;
+                right: 0;
+              }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Side Navigation -->
+        <nav class="bg-gray-800 text-white w-64 space-y-6 py-7 px-2">
+            <div class="flex items-center space-x-4 px-6">
+                <i class="fas fa-university text-2xl"></i>
+                <span class="text-2xl font-extrabold">Admin Portal</span>
+            </div>
+            <ul class="space-y-2">
+                <li>
+                    <a href="{{ url_for('home') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('resultPortal') }}" class="block py-2.5 px-4 rounded transition duration-200 active:bg-blue-700 focus:ring-2 focus:ring-blue-600 hover:bg-blue-700">
+                        <i class="fas fa-chart-bar mr-2"></i>Results
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('connect_scan') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                        <i class="fas fa-users mr-2"></i>Connections
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('Autofile') }}" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-blue-700">
+                        <i class="fas fa-cloud mr-2"></i>Autofile Transfer
+                    </a>
+                </li>
+                <!-- Print Results Button with Dropdown for Font Size -->
+                <li class="relative group">
+                    <a href="#" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-teal-600" id="printResultsButton">
+                        <i class="fas fa-print mr-2 text-gray-100"></i>Print Results
+                    </a>
+                    <!-- Dropdown (Font Size Options) -->
+                    <div class="absolute hidden group-hover:block bg-white border border-gray-200 rounded shadow-md mt-1">
+                        <a href="#" class="block py-2 px-4 text-gray-900 hover:bg-gray-100" data-font-size="large">Large Font</a>
+                        <a href="#" class="block py-2 px-4 text-gray-900 hover:bg-gray-100" data-font-size="small">Small Font</a>
+                        <a href="#" class="block py-2 px-4 text-gray-900 hover:bg-gray-100" id="selectAll">Select All</a>
+                    </div>
+                </li>
+
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="flex justify-between items-center py-4 px-6 bg-white border-b-4 border-blue-800">
+                <div class="flex items-center">
+                    <span class="text-2xl font-semibold text-gray-800">Results</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <!-- Add the "Show Devices" button -->
+                    <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" id="showDevicesButton">
+                        Show Devices
+                    </button>
+                <div class="flex items-center space-x-4">
+                    <!-- Login Button for Admin -->
+                    <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" id="loginButton">
+                        Admin Login
+                    </button>
+                    <button type="button" class="text-gray-500 hover:text-gray-600" id="Vibratingbell">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <button type="button" class="text-gray-500 hover:text-gray-600" id="envelope">
+                        <i class="fas fa-envelope text-xl"></i>
+                    </button>
+                    <span class="text-gray-800">Admin User</span>
+                    <img class="h-8 w-8 rounded-full object-cover" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile">
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200">
+                <div class="container mx-auto px-6 py-8">
+                    <h3 class="text-gray-700 text-3xl font-medium">
+                        <i id="socketioConnect" class="fi fi-bs-hurricane text-4xl"></i>
+                        Admin Portal
+                    </h3>
+                    
+                    <!-- Message Display Area -->
+                    <div id="messageArea" class="mt-4 p-4 bg-blue-100 text-blue-700 rounded-lg hidden"></div>
+
+                    <div class="mt-8">
+                        <!-- Results Table -->
+                        <div class="flex flex-col mt-8">
+                            <div class="-my-2 py-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                                <div class="align-middle inline-block min-w-full shadow overflow-hidden sm:rounded-lg border-b border-gray-200">
+                                    <table class="min-w-full" id="studentsTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Device ID</th>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">File Name</th>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                                                <th class="px-6 py-3 border-b border-gray-200 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Print</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white">
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200" id="device">
+                                                    <div class="text-sm leading-5 text-gray-900">DEV001</div><i class="fi fi-ss-computer inline"></i>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200" id="studentname">
+                                                    <div class="text-sm leading-5 font-medium text-gray-900">JohnDoe_file.txt</div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200" id="score">
+                                                    <div class="text-sm leading-5 text-gray-900">8:45am</div>
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 text-gray-500" id="date">
+                                                    2023-09-09
+                                                </td>
+                                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-sm leading-5 font-medium" id="viewResult">
+                                                    <a href="#" class="text-indigo-600 hover:text-indigo-900">
+                                                        <i class="far fa-eye"></i> View
+                                                    </a>
+                                                </td>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                               <input type="checkbox" class="result-checkbox hidden rounded border-gray-300 text-teal-600 focus:ring-teal-600">
+                                           </td>
+                                            </tr>
+                                            <!-- Add more rows as needed -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="adminLoginModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-1/3">
+            <h3 class="text-2xl font-semibold text-center mb-4">Admin Login</h3>
+            <input type="text" id="adminUsername" class="w-full px-4 py-2 mb-4 border rounded-lg" placeholder="Username" required>
+            <input type="password" id="adminPassword" class="w-full px-4 py-2 mb-4 border rounded-lg" placeholder="Password" required>
+            <div class="flex justify-end">
+                <button id="adminLoginButton" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Login</button>
+            </div>
+        </div>
+    </div>
+     <!-- Device Modal -->
+     <div id="deviceModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 w-1/3 relative">
+            <h3 class="text-2xl font-semibold text-center mb-4">Connected Devices</h3>
+            <div class="flex items-center justify-center mb-4">
+                <!-- Spinner -->
+                <div id="deviceSpinner" class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+            </div>
+            <div id="deviceCount" class="text-center text-gray-800 mb-4">
+                Searching for devices...
+            </div>
+            <!-- Connected devices will be displayed here -->
+            <div id="deviceList" class="flex flex-col space-y-4 hidden">
+                <!-- Device details will be added dynamically -->
+            </div>
+            <!-- Close button for the modal -->
+            <div class="flex justify-center mt-4">
+                <button id="closeModalButton" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Structure -->
+<div class="fixed z-10 inset-0 overflow-y-auto hidden transition-opacity duration-300 ease-out" id="resultModal" aria-labelledby="modalTitle" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-0 transition-opacity duration-300 ease-in-out" id="modalOverlay"></div>
+        </div>
+      <!-- Modal content -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:align-middle sm:max-w-lg sm:w-full opacity-0 transition-opacity duration-300 ease-in-out" id="modalContent" role="document">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+              <i class="fas fa-file-alt text-blue-500"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Result</h3>
+              <div class="mt-2">
+                <p class="text-sm text-gray-500" id="modalBody">
+                  <!-- File content will be dynamically inserted here -->
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" id="closeModalBtn">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <script src="{{ url_for('static', filename='resultportal.js') }}"></script>
+    <script src="{{ url_for('static', filename='Adminview.js') }}"></script>
+    <script src="{{ url_for('static', filename='print.js') }}"></script>
+    <script src="{{ url_for('static', filename='adminsocket.js') }}"></script>
+</body>    
+</body>
+</html>

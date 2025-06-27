@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        // This function creates an <iframe> (and YouTube player)
+        // after the API code downloads.
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('videoPlayer', {
+                height: '360',
+                width: '640',
+                videoId: 'cSIeGBnOaLg', // Replace with your video ID
+                playerVars: {
+                    'autoplay': 1, // Start playing automatically
+                    'controls': 1, // Show controls
+                    'rel': 0, // Don't show related videos
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            // You can add more functionality here if needed
+        }
+    </script>
+    <style>
+        body {
+            background-color: #1e293b; /* Slate-700 */
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .bg-slate-800 {
+            background-color: #1e293b; /* Slate-800 */
+        }
+        .bg-gray-200 {
+            background-color: #e5e7eb; /* Gray-200 */
+        }
+        .bg-blue-500 {
+            background-color: #3b82f6; /* Blue-500 */
+        }
+        .bg-blue-600:hover {
+            background-color: #2563eb; /* Blue-600 */
+        }
+        .bg-gray-300:hover {
+            background-color: #d1d5db; /* Gray-300 */
+        }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-2xl bg-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+        <h1 class="text-2xl font-semibold text-center py-6">Video Demo</h1>
+        <div class="aspect-video bg-gray-200 rounded-t-xl overflow-hidden">
+            <div id="videoPlayer" class="w-full h-full"></div>
+        </div>
+        <div class="p-6 flex justify-between">
+            
+            <button 
+            class="bg-blue-500 text-white rounded-full py-2 px-6 hover:bg-blue-600 transition duration-300"
+            onclick="window.location.href='/Admin2'"
+          >
+            Admin2
+          </button>                Continue
+            </button>
+            <a href="https://youtu.be/cSIeGBnOaLg">
+                <button class="bg-gray-200 text-gray-800 rounded-full py-2 px-6 hover:bg-gray-300 transition duration-300">
+                    Watch Again
+                </button>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+</html>

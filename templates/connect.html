@@ -1,0 +1,418 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Connections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1f2937, #111827);
+            color: #e5e7eb;
+            min-height: 100vh;
+        }
+
+        .glass {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            box-shadow: 10px 10px 30px #0e0f10, -10px -10px 30px #2a2f36;
+            border-radius: 20px;
+        }
+
+        .device-icon {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .btn-hover {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: scale(1.05);
+        }
+
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-content {
+            transition: transform 0.25s ease;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            min-width: 160px;
+            z-index: 1;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+
+        .modal-content {
+            transition: transform 0.25s ease;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+    <div class="glass p-8 w-full max-w-4xl">
+        <h1 class="text-4xl font-bold text-white mb-8 text-center">Device Connections</h1>
+
+        <!-- Host IP Section -->
+        <div id="hostInfo" class="flex items-center p-4 mb-8 bg-white bg-opacity-20 rounded-lg">
+            <div class="device-icon">
+                <i class="fas fa-desktop"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold text-white" id="hostName">Host Name</h3>
+                <p class="text-sm text-gray-200" id="hostIp">Host IP: 0.0.0.0</p>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row items-center justify-between mb-8">
+            <!-- 3D model rendering area -->
+            <div id="device-model" class="mb-4 md:mb-0"></div>
+
+            <div class="flex flex-col items-center">
+                <button id="scanBtn" class="btn-hover bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full mb-4 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                    <i class="fas fa-search mr-2"></i>Scan for Devices
+                </button>
+                <button id="serverBtn" class="btn-hover bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50">
+                    <i class="fas fa-server mr-2"></i>Remote Server
+                </button>
+                <div class="relative inline-block text-left">
+                    <button id="originsBtn" class="btn-hover bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full mt-4">
+                        <i class="fas fa-search mr-2"></i>Origins
+                    </button>
+                    <div id="originsDropdown" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                        <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                            <a href="#" id="addOriginBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Add Origin</a>
+                            <a href="#" id="deleteOriginBtn" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Delete Origin</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connected Devices -->
+        <div id="connectedDevices" class="space-y-4">
+            <!-- Devices dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Server Modal -->
+    <div id="serverModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+
+        <div class="modal-content glass bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto transform scale-95">
+            <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-white text-sm z-50">
+                <svg class="fill-current text-white" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
+            </div>
+
+            <div class="modal-body p-8">
+                <h2 class="text-2xl font-semibold mb-4">Remote Server Address</h2>
+                <p class="mb-4">Your remote server address is:</p>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <code class="text-sm text-gray-800" id="ngrokUrl">Fetching URL...</code>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Origin Modal -->
+    <div id="addOriginModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+
+        <div class="modal-content glass bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto transform scale-95">
+            <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-white text-sm z-50" onclick="closeAModal('addOriginModal')">
+                <i class="fas fa-times"></i>
+            </div>
+
+            <div class="modal-body p-8">
+                <h2 class="text-2xl font-semibold mb-4">Add a New Origin</h2>
+                <input id="addOriginInput" type="text" placeholder="Enter Origin URL" class="w-full p-2 border rounded-lg mb-4">
+                <button id="submitAddOrigin" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-full">Add Origin</button>
+                <div id="addOriginMessage" class="mt-4 text-sm"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Origin Modal -->
+    <div id="deleteOriginModal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+        <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+
+        <div class="modal-content glass bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto transform scale-95">
+            <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-white text-sm z-50" onclick="closeAModal('deleteOriginModal')">
+                <i class="fas fa-times"></i>
+            </div>
+
+            <div class="modal-body p-8">
+                <h2 class="text-2xl font-semibold mb-4">Delete an Origin</h2>
+                <input id="deleteOriginInput" type="text" placeholder="Enter Origin URL" class="w-full p-2 border rounded-lg mb-4">
+                <button id="submitDeleteOrigin" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-full">Delete Origin</button>
+                <div id="deleteOriginMessage" class="mt-4 text-sm"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Fetch and display Host IP and Name on page load
+        async function fetchHostInfo() {
+            try {
+                const response = await fetch('/get_host_ip');
+                const data = await response.json();
+
+                document.getElementById('hostName').innerText = data.host_name;
+                document.getElementById('hostIp').innerText = `Host IP: ${data.host_ip}`;
+            } catch (error) {
+                console.error('Error fetching host info:', error);
+            }
+        }
+
+        window.onload = fetchHostInfo;
+
+        // Scan for connected devices
+        document.getElementById('scanBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('scanBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Scanning...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/get_connected_devices');
+                const data = await response.json();
+                const devicesContainer = document.getElementById('connectedDevices');
+                devicesContainer.innerHTML = ''; // Clear previous devices
+
+                data.devices.forEach(device => {
+                    const deviceElement = document.createElement('div');
+                    deviceElement.className = 'flex items-center p-4 bg-white bg-opacity-20 rounded-lg';
+                    deviceElement.innerHTML = `
+                        <div class="device-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-white">${device.name}</h3>
+                            <p class="text-sm text-gray-200">IP: ${device.ip}</p>
+                        </div>
+                    `;
+                    devicesContainer.appendChild(deviceElement);
+                });
+
+            } catch (error) {
+                console.error('Error fetching connected devices:', error);
+            } finally {
+                btn.innerHTML = '<i class="fas fa-search mr-2"></i>Scan for Devices';
+                btn.disabled = false;
+            }
+        });
+
+        // Remote Server Button Functionality (ngrok URL)
+        document.getElementById('serverBtn').addEventListener('click', async () => {
+            openModal();
+            try {
+                const response = await fetch('/ngrok-url');
+                const data = await response.json();
+
+                if (data.ngrok_url) {
+                    document.getElementById('ngrokUrl').innerText = data.ngrok_url;
+                } else {
+                    document.getElementById('ngrokUrl').innerText = 'Failed to fetch ngrok URL.';
+                }
+            } catch (error) {
+                document.getElementById('ngrokUrl').innerText = 'Error fetching ngrok URL.';
+                console.error('Error fetching ngrok URL:', error);
+            }
+        });
+
+        // Modal Functionality
+        const openModal = () => {
+            const modal = document.getElementById('serverModal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-95');
+            modal.querySelector('.modal-content').classList.add('scale-100');
+        };
+
+        const closeModal = () => {
+            const modal = document.getElementById('serverModal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-100');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+        };
+
+        document.querySelector('.modal-close').addEventListener('click', closeModal);
+        document.querySelector('.modal-overlay').addEventListener('click', closeModal);
+
+        // 3D Model Rendering
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true });
+        renderer.setSize(300, 300);
+        document.getElementById('device-model').appendChild(renderer.domElement);
+
+        const geometry = new THREE.BoxGeometry();
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+    <script>
+
+        // Toggle Origins Dropdown
+        document.getElementById('originsBtn').addEventListener('click', (event) => {
+            event.stopPropagation();
+            document.getElementById('originsDropdown').classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('#originsBtn')) {
+                document.getElementById('originsDropdown').classList.add('hidden');
+            }
+        });
+
+        // Event Listeners for the Origins Dropdown
+        document.getElementById('addOriginBtn').addEventListener('click', (event) => {
+            event.preventDefault();
+            openAModal('addOriginModal');
+        });
+
+        document.getElementById('deleteOriginBtn').addEventListener('click', (event) => {
+            event.preventDefault();
+            openAModal('deleteOriginModal');
+        });
+
+        // Open Modal
+        const openAModal = (modalId) => {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-95');
+            modal.querySelector('.modal-content').classList.add('scale-100');
+        };
+
+        // Close Modal
+        const closeAModal = (modalId) => {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modal.querySelector('.modal-content').classList.remove('scale-100');
+            modal.querySelector('.modal-content').classList.add('scale-95');
+        };
+
+        // Add click event listeners to close buttons in modals
+        document.querySelectorAll('.modal-close').forEach(closeBtn => {
+            closeBtn.addEventListener('click', () => {
+                const modalId = closeBtn.closest('.modal').id;
+                closeAModal(modalId);
+            });
+        });
+
+        // Submit Add Origin
+        document.getElementById('submitAddOrigin').addEventListener('click', async () => {
+            const origin = document.getElementById('addOriginInput').value;
+            const message = document.getElementById('addOriginMessage');
+            if (!origin) {
+                message.innerText = 'Please enter a valid origin URL.';
+                message.classList.add('text-red-500');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/add_origin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ origin }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    message.innerText = 'Origin added successfully!';
+                    message.classList.remove('text-red-500');
+                    message.classList.add('text-green-500');
+                } else {
+                    message.innerText = data.error || 'Failed to add origin.';
+                    message.classList.remove('text-green-500');
+                    message.classList.add('text-red-500');
+                }
+            } catch (error) {
+                message.innerText = 'An error occurred while adding the origin.';
+                message.classList.remove('text-green-500');
+                message.classList.add('text-red-500');
+            }
+        });
+
+        // Submit Delete Origin
+        document.getElementById('submitDeleteOrigin').addEventListener('click', async () => {
+            const origin = document.getElementById('deleteOriginInput').value;
+            const message = document.getElementById('deleteOriginMessage');
+            if (!origin) {
+                message.innerText = 'Please enter a valid origin URL.';
+                message.classList.add('text-red-500');
+                return;
+            }
+
+            try {
+                const response = await fetch('/admin/delete_origin', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ origin }),
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    message.innerText = 'Origin deleted successfully!';
+                    message.classList.remove('text-red-500');
+                    message.classList.add('text-green-500');
+                } else {
+                    message.innerText = data.error || 'Failed to delete origin.';
+                    message.classList.remove('text-green-500');
+                    message.classList.add('text-red-500');
+                }
+            } catch (error) {
+                message.innerText = 'An error occurred while deleting the origin.';
+                message.classList.remove('text-green-500');
+                message.classList.add('text-red-500');
+            }
+        });
+    </script>
+</body>
+</html>

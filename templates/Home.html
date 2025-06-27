@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home Screen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      font-family: 'Lexend Deca', sans-serif;
+    }
+    .blob {
+      background: url('../static/img/icons/magicpattern-blob-1722751921610.png') no-repeat center center / cover;
+      height: 30rem;
+    }
+    .bg-placeholder {
+      background: url('../static/img/assets/darkbackground.jpg') no-repeat center center / cover;
+    }
+    #sucess {
+        margin-top: 8rem;
+        display: block;
+        text-wrap: wrap;
+        width: 15rem;
+        margin-left: 8rem;
+        font-size: large;
+        font-weight: 700;
+    }
+    #starfish {
+        margin-right: 4rem;
+    }
+    .modal {
+      transition: opacity 0.25s ease;
+    }
+    .modal-content {
+      transition: transform 0.25s ease;
+    }
+  </style>
+</head>
+<body class="bg-black flex items-center justify-center min-h-screen bg-placeholder">
+
+  <div class="max-w-5xl w-full p-8 h-screen">
+    <!-- Navbar -->
+    <nav class="flex justify-around bg-gray-400 bg-opacity-50 py-4 rounded-lg mb-8">
+      <a href="#" class="flex p-2 text-gray-200 h-10 w-20 rounded-lg hover:bg-orange-500 transition-all">Home</a>
+      <a href="#" id="gamesLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Games</a>
+      <a href="#" id="learningLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Learning</a>
+      <a href="#" id="updatesLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Updates</a>
+      <a href="#" id="guideLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Guide</a>
+    </nav>
+
+    <div class="relative flex">
+      <!-- Left Section with Radio Buttons -->
+      <div class="bg-gray-400 bg-opacity-50 p-8 rounded-lg shadow-lg h-72 max-w-md w-2/5 mr-8 mt-8">
+        <p class="text-gray-300 mb-4">Please select one</p>
+        <div class="mb-4">
+          <label class="inline-flex items-center">
+            <input type="radio" class="form-radio text-blue-500" name="role" value="admin" id="HomeAdmin">
+            <span class="ml-2 text-gray-300">Admin</span>
+          </label>
+        </div>
+        <div class="mb-8">
+          <label class="inline-flex items-center">
+            <input type="radio" class="form-radio text-blue-500" name="role" value="student" id="HomeStudent">
+            <span class="ml-2 text-gray-300">Student</span>
+          </label>
+        </div>
+        <button id="nextChoice" class="bg-orange-500 text-white py-2 px-8 rounded-lg hover:bg-green-500 transition-all shadow-lg">Next</button>
+      </div>
+
+      <!-- Right Section with Blob and Text -->
+      <div class="flex-1 blob p-8 rounded-lg shadow-lg relative text-white">
+        <p class="mb-4" id="sucess">Success is no accident. It is hard work, perseverance, learning, studying, sacrifice, and most of all, love of what you are doing or learning to do every day.</p>
+        <!-- Placeholder for Starfish Image -->
+        <div class="absolute bottom-4 right-4" id="starfish">
+          <img src="../static/img/icons/—Pngtree—cute cartoon starfish_14641921.png" alt="Starfish" class="w-40 h-40 motion-safe:animate-bounce">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Template -->
+  <div id="modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center">
+    <div class="modal-overlay absolute w-full h-full bg-gray-900 opacity-50"></div>
+    
+    <div class="modal-content bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto transform scale-95">
+      <div class="modal-close absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-sm text-gray-500 z-50">
+        <svg class="fill-current text-gray-500" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+          <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+        </svg>
+      </div>
+
+      <div class="modal-body p-8">
+        <!-- Modal content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='home.js') }}"></script>
+  <script>
+    const modal = document.getElementById('modal');
+    const modalBody = modal.querySelector('.modal-body');
+    const modalClose = modal.querySelector('.modal-close');
+
+    function openModal(content) {
+      modalBody.innerHTML = content;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.querySelector('.modal-content').classList.remove('scale-95');
+      modal.querySelector('.modal-content').classList.add('scale-100');
+    }
+
+    function closeModal() {
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modal.querySelector('.modal-content').classList.remove('scale-100');
+      modal.querySelector('.modal-content').classList.add('scale-95');
+    }
+
+    modalClose.addEventListener('click', closeModal);
+
+    document.getElementById('gamesLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(`
+        <h2 class="text-2xl font-bold mb-4">Games</h2>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-gamepad text-4xl text-blue-500 mr-4"></i>
+          <p>Visit our game site for exciting games!</p>
+        </div>
+        <a href="https://articfoxinc.my.canva.site/" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Go to Games</a>
+      `);
+    });
+
+    document.getElementById('learningLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(`
+        <h2 class="text-2xl font-bold mb-4">Learning Resources</h2>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-book-open text-4xl text-green-500 mr-4"></i>
+          <p>Choose a learning resource to get started:</p>
+        </div>
+        <ul class="list-disc list-inside">
+          <li><a href="https://articfoxinc.my.canva.site/" class="text-blue-500 hover:underline">Video Tutorials</a></li>
+          <li><a href="https://articfoxinc.my.canva.site/" class="text-blue-500 hover:underline">Interactive Courses</a></li>
+          <li><a href="https://articfoxinc.my.canva.site/" class="text-blue-500 hover:underline">PDF Guides</a></li>
+        </ul>
+      `);
+    });
+
+    document.getElementById('updatesLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(`
+        <h2 class="text-2xl font-bold mb-4">Updates & Social Links</h2>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-code-branch text-4xl text-purple-500 mr-4"></i>
+          <p>Check out our latest updates and connect with us:</p>
+        </div>
+        <div class="flex space-x-4">
+          <a href="https://github.com/princejerry92" class="text-gray-800 hover:text-gray-600" target="_blank"><i class="fab fa-github text-3xl"></i></a>
+          <a href="https://twitter.com/@artic_fox92" class="text-blue-400 hover:text-blue-300" target="_blank"><i class="fab fa-twitter text-3xl"></i></a>
+          <a href="https://linkedin.com/in/articfox92" class="text-blue-700 hover:text-blue-600" target="_blank"><i class="fab fa-linkedin text-3xl"></i></a>
+          <a href="https://wa.me/+2347011853528" class="text-green-500 hover:text-green-400" target="_blank"><i class="fab fa-whatsapp text-3xl"></i></a>
+        </div>
+      `);
+    });
+
+    document.getElementById('guideLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal(`
+        <h2 class="text-2xl font-bold mb-4">User Guide</h2>
+        <div class="flex items-center mb-4">
+          <i class="fas fa-book text-4xl text-yellow-500 mr-4"></i>
+          <p>Choose how you'd like to access the user guide:</p>
+        </div>
+        <div class="flex space-x-4">
+          <a href="https://articfoxinc.my.canva.site/" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">Online Manual</a>
+          <a href="video.html" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition-colors">Watch Demo Video</a>
+        </div>
+      `);
+    });
+  </script>
+</body>
+</html>

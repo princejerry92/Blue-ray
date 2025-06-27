@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web3 Automatic File Transfer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#1a1a2e',
+                        primary: '#0f3460',
+                        secondary: '#16213e',
+                        accent: '#e94560',
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .neumorphic {
+            background: #1a1a2e;
+            box-shadow: 5px 5px 10px #151525, -5px -5px 10px #1f1f37;
+            border-radius: 15px;
+        }
+
+        .neumorphic-inset {
+            background: #1a1a2e;
+            box-shadow: inset 5px 5px 10px #151525, inset -5px -5px 10px #1f1f37;
+            border-radius: 15px;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        #Searchfolder {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="text-gray-300">
+    <div class="flex h-screen">
+        <!-- Side Navigation -->
+        <nav class="neumorphic w-64 p-6 space-y-6">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-sync-alt text-2xl text-accent"></i>
+                <span class="text-2xl font-extrabold">File Transfer</span>
+            </div>
+            <ul class="space-y-2">
+                <li>
+                    <a href="#" class="block py-2.5 px-4 rounded transition-all hover:bg-primary hover:text-white">
+                        <i class="fas fa-home mr-2"></i>Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2.5 px-4 rounded transition-all hover:bg-primary hover:text-white">
+                        <i class="fas fa-exchange-alt mr-2"></i>Transfer Files
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2.5 px-4 rounded transition-all hover:bg-primary hover:text-white">
+                        <i class="fas fa-history mr-2"></i>Transfer History
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2.5 px-4 rounded transition-all hover:bg-primary hover:text-white">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="block py-2.5 px-4 rounded transition-all hover:bg-primary hover:text-white">
+                        <i class="fas fa-question-circle mr-2"></i>Help
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Bar -->
+            <header class="flex justify-between items-center py-4 px-6 bg-secondary">
+                <div class="flex items-center">
+                    <span class="text-2xl font-semibold">Web3 Automatic File Transfer</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-400 hover:text-accent transition-all">
+                        <i class="fas fa-bell text-xl" id="bell"></i>
+                    </button>
+                    <span>Admin User</span>
+                    <img class="h-10 w-10 rounded-full object-cover neumorphic" src="https://randomuser.me/api/portraits/men/1.jpg" alt="Profile">
+                </div>
+            </header>
+
+            <!-- Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-dark p-6">
+                <div class="container mx-auto">
+                    <h3 class="text-3xl font-medium mb-6">File Search and Transfer</h3>
+                    <div id="DisplayArea" class="flex-1 flex flex-col overflow-hidden  p-6" style="width: 100%; height: 100%;">
+
+                        <!-- Your content here -->
+                    </div>
+                    
+                    
+                    <!-- 3D File Search Icon -->
+                    <div class="flex justify-center mb-8">
+                        <img id="Searchfolder" class="w-32 h-32" src="../static/img/assets/add-folder.gif" alt="">
+                    </div>
+
+                    <!-- File Search Form -->
+                    <div class="max-w-md mx-auto mb-8">
+                        <form id="searchform" class="neumorphic p-6">
+                            <div class="mb-4">
+                                <label class="block text-gray-400 text-sm font-bold mb-2" for="filename">
+                                    File Name
+                                </label>
+                                <input class="neumorphic-inset appearance-none w-full py-2 px-3 text-gray-300 leading-tight focus:outline-none focus:shadow-outline bg-transparent" id="filename" type="text" placeholder="Enter file name">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <button id="search" class="bg-primary hover:bg-accent text-white font-bold py-2 px-4 rounded transition-all hover-lift" type="button">
+                                    Search
+                                </button>
+                                <button id="transfer" class="bg-accent hover:bg-primary text-white font-bold py-2 px-4 rounded transition-all hover-lift" type="button">
+                                    Transfer
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Recent Transfers -->
+                    <div>
+                        <h4 class="text-xl font-medium mb-4">Recent Transfers</h4>
+                        <div class="neumorphic overflow-hidden">
+                            <ul class="divide-y divide-gray-700">
+                                <li class="px-6 py-4 hover:bg-secondary transition-all">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-file-alt text-accent mr-3"></i>
+                                            <span class="text-sm font-medium" id="document">document.pdf</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500" id="time">2 minutes ago</span>
+                                    </div>
+                                </li>
+                                <li class="px-6 py-4 hover:bg-secondary transition-all">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-file-image text-accent mr-3"></i>
+                                            <span class="text-sm font-medium" id="imageTransfer">image.jpg</span>
+                                        </div>
+                                        <span class="text-sm text-gray-500" id="timeImg">1 hour ago</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='Fileanimate.js') }}"></script>
+    <script src="{{ url_for('static', filename='AFTP.js') }}"></script>
+
+    <script>
+    // Add scroll animation
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const mainContent = document.querySelector('main');
+        mainContent.addEventListener('scroll', () => {
+            const elements = document.querySelectorAll('.neumorphic, .neumorphic-inset');
+            elements.forEach((el) => {
+                const rect = el.getBoundingClientRect();
+                const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+                if (isVisible) {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                } else {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                }
+            });
+        });
+    });
+
+    // Add micro-interactions
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+        button.addEventListener('mousedown', () => {
+            button.style.transform = 'scale(0.95)';
+        });
+        button.addEventListener('mouseup', () => {
+            button.style.transform = 'scale(1)';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.transform = 'scale(1)';
+        });
+    });
+    </script>
+</body>
+</html>
