@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin 2 Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #00cec9;
+            --background-color: #13181c;
+            --text-color: #1c5e78;
+            --accent-color: #ffeaa7;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .glow {
+            box-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--secondary-color);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: var(--text-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .loading-bar {
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+            transition: width 0.3s ease;
+        }
+
+        /* Existing styles */
+        #file2 { margin-right: 6rem; }
+        #file { margin-left: 6rem; }
+        #open { margin-left: 8rem; }
+        #examDetails {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+        
+        #examDetails ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        
+        #examDetails li {
+            margin-bottom: 8px;
+        }
+        
+        .file-icon {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-icon.selected {
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.5);
+            border-radius: 8px;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: var(--accent-color);
+            color: aliceblue;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .dropdown button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: background 0.3s ease;
+        }
+
+        .dropdown button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: rgba(30, 39, 46, 0.9);
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 80%;
+            hover:var(--accent-color);
+            max-width: 500px;
+            color: var(--text-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: scale(0.9);
+            transition: all 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .close {
+            color: var(--text-color);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--accent-color);
+        }
+
+        #downloadAnimation {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #ipInput {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+        }
+
+        #resultStatus {
+            color: var(--accent-color);
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        #progressBar {
+            width: 80%;
+            height: 10px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        #progressBar::-webkit-progress-bar {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        #progressBar::-webkit-progress-value {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+        
+        #progressPercentage {
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 10px;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <div class="container">
+        <div class="flex w-full max-w-5xl bg-opacity-10 bg-white rounded-3xl shadow-2xl overflow-hidden flex h-svh animate-float">
+            <!-- Left Panel -->
+            <div class="w-1/3 bg-opacity-20 bg-black p-6 space-y-4 relative">
+                <div class="flex items-center space-x-3 mb-8">
+                    <img src="../static/img/assets/royal.jpg" alt="logo" class="w-10 h-10 rounded-full glow">
+                    <span class="text-xl font-semibold">Admin 2</span>
+                </div>
+                <div class="relative">
+                    <button class="btn w-full" id="Downloads" onclick="window.location.href='/downloads'">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        Downloads
+                        <span class="badge bg-red-600 text-white rounded-full py-1 px-2 ml-2" id="badge" style="display: none;">New!</span>
+                    </button>
+                </div>
+
+                <button class="btn w-full mt-4" id="viewResult" onclick="window.location.href='/Result_list'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd" />
+                    </svg>
+                    View Results
+                </button>
+
+                <button class="btn w-full mt-4" id="connections">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                    </svg>
+                    Connections
+                </button>
+
+                <button type="button" class="btn w-full mt-4" onclick="window.location.href='/Timer'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                    </svg>
+                    Timer
+                </button>
+
+                <button class="btn w-full mt-4" onclick="window.location.href='/subject'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+                    </svg>
+                    Subject
+                </button>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="w-2/3 p-6 relative">
+                <div class="absolute top-6 right-6">
+                    <button id="resultUploader" class="btn">
+                        Upload Results
+                    </button>
+                    <input type="file" id="fileInput" style="display: none;">
+                </div>
+
+                <div class="mt-20 flex justify-between">
+                    <div class="flex file-icon card" id="file">
+                        <img src="../static/img/icons/folder.png" alt="folder" class="w-32 h-32">
+                    </div>
+                    <div class="flex file-icon card" id="file2">
+                        <img src="../static/img/icons/folder.png" alt="folder" class="w-32 h-32">
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button class="btn w-3/5" id="open">
+                        Start Exam
+                    </button>
+                </div>
+
+                <input type="text" id="ipInput" placeholder="Enter host IP address" class="mt-4">
+            </div>
+        </div>
+    </div>
+
+    <div id="dropdown" class="dropdown">
+        <button id="listBtn">List</button>
+        <button id="downloadBtn">Download</button>
+        <button id="renameBtn">Rename</button>
+        <button id="removeBtn">Remove</button>
+    </div>
+
+    <div id="listModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Available Files</h2>
+            <ul id="fileList"></ul>
+        </div>
+    </div>
+
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="errorTitle"></h2>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <div id="downloadAnimation">
+        <svg class="animate-bounce w-6 h-6 mb-3" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
+        <p>Downloading...</p>
+    </div>
+
+    <div id="connectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="connectionStatus"></h2>
+            <div id="connectionIcon"></div>
+        </div>
+    </div>
+
+    
+   <!-- progress Modal container -->
+<div class="modal" id="progress-modal">
+    <!-- Modal content -->
+    <div class="modal-content">
+      <!-- Progress status and bar container -->
+      <div class="progress-container">
+      <div class="w-64 h-2 bg-gray-700 rounded-full overflow-hidden mt-4">
+        <div class="h-full bg-green-500" style="width: 50%;"></div>
+      </div>
+        <!-- Progress status text -->
+        <p id="progressStatus" class="progress-status text-green-400 text-xl">Sending...</p>
+        <!-- Progress bar -->
+        <div class="progress-bar-container rounded-md">
+          <progress id="progressBar" value="0" max="100"></progress>
+          <span id="progressPercentage" class="progress-percentage">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Result Modal -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="resultStatus"></h2>
+            <div id="resultIcon"></div>
+        </div>
+    </div>
+
+     
+    <!--Details modal-->
+<div id="examModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full" style="display:none;">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white text-teal-800">
+        <div id="examDetails">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button id="cancelExam" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Cancel
+            </button>
+            <button id="startExam" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
+                Start Exam
+            </button>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startExamButton = document.getElementById('startExam');
+          
+            startExamButton.addEventListener('click', function() {
+              window.location.href = '{{ url_for("examloader2") }}';
+            });
+
+            // Animate loading bar
+            const loadingBar = document.getElementById('loadingBar');
+            gsap.to(loadingBar, {width: '100%', duration: 1, ease: 'power2.out'});
+
+            // Animate cards
+            gsap.from('.card', {
+                opacity: 0,
+                y: 50,
+                stagger: 0.2,
+                duration: 0.8,
+                ease: 'back.out(1.7)'
+            });
+
+            // Animate buttons
+            gsap.from('.btn', {
+                scale: 0.5,
+                opacity: 0,
+                stagger: 0.1,
+                duration: 0.5,
+                ease: 'back.out(1.7)'
+            });
+
+            // Micro-interactions
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    gsap.to(btn, {scale: 1.05, duration: 0.2});
+                });
+                btn.addEventListener('mouseleave', () => {
+                    gsap.to(btn, {scale: 1, duration: 0.2});
+                });
+            });
+
+            // Scroll animations
+            const scrollElements = document.querySelectorAll('.card, .btn');
+            const elementInView = (el, dividend = 1) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return (
+                    elementTop <=
+                    (window.innerHeight || document.documentElement.clientHeight) / dividend
+                );
+            };
+
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if (elementInView(el, 1.25)) {
+                        el.classList.add("scrolled");
+                    }
+                });
+            };
+
+            window.addEventListener("scroll", () => {
+                handleScrollAnimation();
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='Admin2viewer.js') }}"></script>
+    <script src="{{ url_for('static', filename='Admin2upload.js') }}"></script>
+</body>
+</html>

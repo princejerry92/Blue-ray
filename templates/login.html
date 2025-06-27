@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Lexend Deca', sans-serif;
+            background: url('../static/img/assets/darkbackground.jpg') no-repeat center center / cover;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            color: white;
+        }
+        
+        .modal-button {
+            background-color: #ff7043;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .modal-button:hover {
+            background-color: #ff5722;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            color: #fff;
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+        .social-links i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #333;
+            color: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff7043;
+        }
+
+        #add-admin-form button {
+            background-color: #ff7043;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        #add-admin-form button:hover {
+            background-color: #ff5722;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+
+    <div class="relative w-full max-w-4xl bg-gray-400 rounded-lg shadow-xl p-8">
+        <nav class="mb-4">
+            <ul class="flex bg-gray-400 rounded-lg p-1 h-12">
+                <li><a href="#" class="flex p-2 text-gray-200 h-10 w-20 rounded-lg hover:bg-orange-500 transition-all">Home</a></li>
+                <li><a href="#" id="gamesLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Games</a></li>
+                <li><a href="#" id="learningLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Learning</a></li>
+                <li><a href="#" id="updatesLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Updates</a></li>
+                <li><a href="#" id="guideLink" class="flex p-2 text-gray-200 w-20 h-10 rounded-lg hover:bg-orange-500 transition-all">Guide</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="flex">
+            <div class="w-1/2 pr-8">
+                <form class="bg-gray-400 rounded-lg p-6">
+                    <h2 class="text-2xl font-bold">LOGIN ADMIN</h2>
+                    <div class="mb-4">
+                        <label class="block mb-2">Enter Username</label>
+                        <input type="text" class="w-full bg-gray-600 rounded-lg px-3 py-2" id="username">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2">Enter Password</label>
+                        <input type="password" class="w-full bg-gray-600 rounded-lg px-3 py-2" id="password">
+                    </div>
+                    <button type="submit" class="w-3/4 bg-orange-500 text-white rounded-2xl py-2 mt-8 rounded-lg shadow-lg ml-8">Next</button>
+                    <div class="flex items-center mt-4 text-orange-500">Add New Admin</div>
+                </form>
+            </div>
+            <div class="w-1/2 flex items-center">
+                <div>
+                    <div class="text-2xl font-bold mb-4">Quote of the Day.</div>
+                    <p class="text-lg">Success is no accident. It is hard work, perseverance, learning, studying, sacrifice, and most of all, love of what you are doing or learning to do.</p>
+                </div>
+            </div>
+        </div>
+         <!-- Feedback Modal -->
+         <div id="feedbackModal" class="modal hidden">
+            <div class="modal-content">
+                <p id="feedbackMessage">Success! You will be redirected shortly.</p>
+                <button class="modal-button" id="closeFeedbackModal">Close</button>
+            </div>
+        </div>
+
+        <!-- Error Modal -->
+        <div id="errorModal" class="modal hidden">
+            <div class="modal-content">
+                <p id="errorMessage">An error occurred. Please try again.</p>
+                <button class="modal-button" id="closeErrorModal">Close</button>
+            </div>
+        </div>
+        <!-- Modal Template -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-body">
+                <span class="modal-close">&times;</span>
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
+    <script>
+const modal = document.getElementById('modal');
+const modalContent = document.querySelector('.modal-body');
+const closeModalButton = document.querySelector('.modal-close');
+
+function viewPassword(id) {
+    const newpasswordInput = document.getElementById(id);
+    const viewPasswordIcon = newpasswordInput.parentElement.querySelector('.view-password i');
+    
+    if (newpasswordInput.type === 'password') {
+        newpasswordInput.type = 'text';
+        viewPasswordIcon.classList.remove('fa-eye-slash');
+        viewPasswordIcon.classList.add('fa-eye');
+    } else {
+        newpasswordInput.type = 'password';
+        viewPasswordIcon.classList.remove('fa-eye');
+        viewPasswordIcon.classList.add('fa-eye-slash');
+    }
+    
+    }
+    
+    
+
+// Open modal and set content
+function openModal(content) {
+    modalContent.innerHTML = content;
+    modal.classList.remove('hidden');
+}
+
+// Close modal when clicking on the close button
+closeModalButton.addEventListener('click', () => {
+    modal.classList.add('hidden');
+});
+
+// Close modal when clicking outside of it
+document.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.classList.add('hidden');
+    }
+});
+
+// Games Modal
+document.getElementById('gamesLink').addEventListener('click', () => {
+    const content = `
+        <i class="fas fa-gamepad modal-icon"></i>
+        <h2 class="text-xl font-bold mb-4">Welcome to Our Game Site</h2>
+        <a href="https://articfoxinc.my.canva.site/" target="_blank" class="modal-button">Play Now</a>
+    `;
+    openModal(content);
+});
+
+// Learning Modal
+document.getElementById('learningLink').addEventListener('click', () => {
+    const content = `
+        <i class="fas fa-book modal-icon"></i>
+        <h2 class="text-xl font-bold mb-4">Choose Your Learning Resource</h2>
+        <a href="https://articfoxinc.my.canva.site/" target="_blank" class="modal-button">Go to Resources</a>
+    `;
+    openModal(content);
+});
+
+// Updates Modal
+document.getElementById('updatesLink').addEventListener('click', () => {
+    const content = `
+        <i class="fas fa-sync-alt modal-icon"></i>
+        <h2 class="text-xl font-bold mb-4">Check New Updates</h2>
+        <div class="social-links">
+            <a href="https://github.com/princejerry92" target="_blank"><i class="fab fa-github"></i></a>
+            <a href="https://twitter.com/@artic_fox92" target="_blank"><i class="fab fa-twitter"></i></a>
+            <a href="https://linkedin.com/in/articfox92" target="_blank"><i class="fab fa-linkedin"></i></a>
+            <a href="https://wa.me/+2347011853528" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+    `;
+    openModal(content);
+});
+
+// Guide Modal
+document.getElementById('guideLink').addEventListener('click', () => {
+    const content = `
+        <i class="fas fa-question-circle modal-icon"></i>
+        <h2 class="text-xl font-bold mb-4">User Guide</h2>
+        <p class="mb-4">Would you like to read the guide or watch a demo?</p>
+        <a href="https://articfoxinc.my.canva.site/" target="_blank" class="modal-button">Read Guide</a>
+        <a href="video.html" class="modal-button">Watch Demo</a>
+    `;
+    openModal(content);
+});
+
+
+document.querySelector('.flex.items-center.mt-4.text-orange-500').addEventListener('click', () => {
+    // Create and display the modal
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-body">
+                <h2>Add New Admin</h2>
+                <form id="add-admin-form">
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">New Password:</label>
+                        <div class="relative">
+                            <input type="password" id="newpassword" name="newpassword" required>
+                            <span class="view-password absolute right-3 top-3 cursor-pointer" onclick="viewPassword('password')">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password:</label>
+                        <div class="relative">
+                            <input type="password" id="confirm-password" name="confirm-password" required>
+                            <span class="view-password absolute right-3 top-3 cursor-pointer" onclick="viewPassword('confirm-password')">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                        <span id="password-mismatch" style="color: red; display: none;">Passwords do not match</span>
+
+                    </div>
+                    <div class="form-group">
+                        <label for="default-password">Default Password:</label>
+                        <div class="relative">
+                            <input type="password" id="default-password" name="default-password" required>
+                            <span class="view-password absolute right-3 top-3 cursor-pointer" onclick="viewPassword('default-password')">
+                                <i class="fas fa-eye-slash"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <button type="submit">Add Admin</button>
+                </form>
+            </div>
+        </div>
+    `;
+
+// Add the modal to the DOM
+document.body.appendChild(modal);
+
+// Handle modal close functionality
+document.querySelector('.modal-close').addEventListener('click', () => {
+    modal.remove();
+});
+
+// Close modal when clicking outside of it
+document.addEventListener('click', (e) => {
+    if (e.target === modal) {
+        modal.classList.add('hidden');
+    }
+});
+
+
+// Form submission logic
+const form = document.getElementById('add-admin-form');
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value.trim().toLowerCase();
+    const newpassword = document.getElementById('newpassword').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const defaultPassword = document.getElementById('default-password').value;
+
+    // Check if passwords match
+    if (newpassword !== confirmPassword) {
+        document.getElementById('password-mismatch').style.display = 'block';
+        return;
+    } else {
+        document.getElementById('password-mismatch').style.display = 'none';
+    }
+
+    // Check if password starts with '@'
+    if (!newpassword.startsWith('@')) {
+        alert('Password must start with @');
+        return;
+    }
+
+    // Validate default password based on the username
+    if (username === 'admin1' && defaultPassword !== '@RoyalRangers') {
+        alert('Incorrect default password for admin1');
+        return;
+    }
+    if (username === 'admin2' && defaultPassword !== '@1234ABCD') {
+        alert('Incorrect default password for admin2');
+        return;
+    }
+
+    // Send data to server to add the new admin
+    try {
+        const response = await fetch('/new_admin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: username,
+                password: newpassword
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            modal.remove();
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error creating new admin');
+    }
+});
+
+});
+       
+    </script>
+</body>
+</html>

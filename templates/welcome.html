@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Royal Rangers Academy</title>
+  <link rel="stylesheet" href="../static/css/welcome.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Lexend Deca', sans-serif;
+    }
+    .background-image {
+      background-image: url('../static/img/assets/darkbackground.jpg');
+      width: 10rem;
+      height: 38rem;
+      background-size: cover;
+      background-position: center;
+    }
+    .carousel-item {
+      display: none; 
+      height: 37.5rem;     
+    }
+    .carousel-item.active {
+      display: flex;
+      height: 37.5rem;
+    }
+    /* Smooth fade-in and slide animation for carousel */
+    .carousel-item {
+      opacity: 0;
+      transform: translateX(100%);
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    }
+
+    .carousel-item.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  </style>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center">
+
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+
+    <!-- Left Section -->
+    <div class="w-2/5 background-image rounded-lg" id="blackbackground">
+      <div class="p-2 mb-4" id="rangerstxt" >
+        <div class="text-4xl font-bold text-wrap ">Royal Rangers</div>
+         <span class="text-4xl font-bold block mt-2 mb-4" id="Accademytxt">Accademy</span>
+                
+      </div>
+      <div>
+       <a href="{{ url_for('home') }}"><button class="bg-orange-500 mt-8 ml-8 text-white font-bold py-2 px-4 rounded-[50px] transition-all hover:bg-green-500 hover:translate-x-2 flex items-center" id="Getstared">
+          Get Started
+          <svg class="ml-2 w-5 h-5 transition-all" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button></a>
+      </div>
+      <div class="mt-8 text-sm ml-2">Computer based testing software</div>
+    </div>
+    <!-- Right Section (Carousel) -->
+    <div class="flex p-1" id="carouselcont">
+      <div class="carousel h-max" >
+        <div class="carousel-item active">
+          <img src="../static/img/assets/Royal pic3.jpg" alt="Image 1" class="rounded-lg w-full">
+        </div>
+        <div class="carousel-item">
+          <img src="../static/img/assets/Royalpic2.jpg" alt="Image 2" class="rounded-lg w-full">
+        </div>
+        <div class="carousel-item">
+          <img src="../static/img/assets/Royalpic4.jpg" alt="Image 3" class="rounded-lg w-full">
+        </div>
+        <div class="carousel-item">
+          <img src="../static/img/assets/Royalpic5.jpg" alt="Image 4" class="rounded-lg w-full">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentIndex = 0;
+    const items = document.querySelectorAll('.carousel-item');
+
+    setInterval(() => {
+      items[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % items.length;
+      items[currentIndex].classList.add('active');
+    }, 3000);
+  </script>
+</body>
+</html>

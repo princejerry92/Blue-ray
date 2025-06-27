@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Page</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #212121;
+            color: #FFFFFF;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-home {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #03A9F4;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-home:hover {
+            background-color: #0288D1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video id="autoplayVideo" controls>
+            <source src="../static/img/assets/Driibbble - 404 Page.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <a onclick="window.location.href='/home'"  class="btn-home">Go Back to Home</a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var video = document.getElementById('autoplayVideo');
+            video.muted = true; // Mute the video to allow autoplay
+            video.loop = true;  // Ensure looping is set
+            video.play().catch(function(error) {
+                console.log("Autoplay was prevented: ", error);
+                // You can show a play button or message here if autoplay is blocked
+            });
+
+            // Ensure the video loops even if it's played manually
+            video.addEventListener('ended', function() {
+                this.currentTime = 0;
+                this.play();
+            }, false);
+        });
+    </script>
+</body>
+</html>

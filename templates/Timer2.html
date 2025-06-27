@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Time Setter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('../static/img/assets/darkbackground.jpg') no-repeat center center / cover;
+        }
+
+        @keyframes sand-flow {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+        }
+        .animate-sand-flow {
+            animation: sand-flow 15s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+        <div class="bg-orange-800 p-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-white">Set Exam Time</h2>
+            <i class="fas fa-hourglass-half text-3xl text-green-500 animate-sand-flow"></i>
+        </div>
+        <div class="p-6 space-y-6">
+            <div class="flex space-x-4">
+                <div class="flex-1">
+                    <label for="hours" class="block text-sm font-medium text-gray-700 mb-1">Hours</label>
+                    <div class="relative">
+                        <input type="number" id="hours" name="hours" min="0" max="23" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm" placeholder="00">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-clock text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <label for="minutes" class="block text-sm font-medium text-gray-700 mb-1">Minutes</label>
+                    <div class="relative">
+                        <input type="number" id="minutes" name="minutes" min="0" max="59" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm" placeholder="00">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-stopwatch text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <label for="seconds" class="block text-sm font-medium text-gray-700 mb-1">Seconds</label>
+                    <div class="relative">
+                        <input type="number" id="seconds" name="seconds" min="0" max="59" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm" placeholder="00">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-hourglass-end text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="button" id="resetBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-indigo-600 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-undo-alt mr-2"></i>
+                    Reset
+                </button>
+                <button type="button" id="saveBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Time
+                </button>
+            </div>
+             <!-- Flash messages section -->
+        <div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="p-4 mb-4 text-sm text-white bg-green-500 rounded-lg" role="alert">
+                        <ul>
+                            {% for category, message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        </div>
+    </div>
+
+    
+    <script src="{{ url_for('static', filename='Time.js') }}"></script>
+
+</body>
+</html>

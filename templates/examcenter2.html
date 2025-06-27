@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Exam Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: #e2e8f0;
+        }
+
+        .russo-one {
+            font-family: 'Russo One', sans-serif;
+        }
+
+        .hexagon {
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #2d3748;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #718096;
+        }
+
+        .glassmorphism {
+            background: rgba(26, 32, 44, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .neon-border {
+            box-shadow: 0 0 5px #3182ce, 0 0 10px #3182ce;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        #mainContainer {
+            transition: all 0.5s ease-in-out;
+        }
+
+        .column-layout {
+            flex-direction: column;
+        }
+        
+        .column-layout #maindiv,
+        .column-layout #optionCasing {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="container mx-auto p-8">
+        <header class="flex justify-between items-center mb-12">
+            <h1 class="text-4xl font-bold russo-one text-blue-400" id="welcomeMessage"></h1>
+            <span class="text-3xl font-bold text-blue-300" id="subjectDisplay"></span>
+            <button id="toggleLayout" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out transform hover:scale-105">
+                <i class="fas fa-exchange-alt"></i>
+            </button>
+        </header>
+
+        <div id="mainContainer" class="flex gap-8 mb-8">
+            <!-- Question Section -->
+            <div class="w-1/2 glassmorphism rounded-2xl shadow-xl p-8 neon-border" id="maindiv">
+                <h2 class="text-3xl font-semibold mb-6 russo-one text-blue-300">Questions</h2>
+                <div class="h-96 overflow-y-auto custom-scrollbar pr-4" id="questionContainer">
+                    <div class="loader"></div>
+                </div>
+            </div>
+
+            <!-- Multiple Choice Section -->
+            <div class="w-1/2 glassmorphism rounded-2xl shadow-xl p-8 neon-border" id="optionCasing">
+                <h2 class="text-3xl font-semibold mb-6 russo-one text-blue-300">Multiple Choice</h2>
+                <div class="relative">
+                    <div class="carousel" id="optioncarousel"></div>
+                    <button id="prevButton" class="absolute top-1/2 -left-12 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition duration-300 ease-in-out">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="nextButton" class="absolute top-1/2 -right-12 transform -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition duration-300 ease-in-out">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timer and Submit Button -->
+        <div class="flex justify-between items-center">
+            <div class="text-6xl font-bold text-blue-400 flex items-center">
+                <i id="timerIcon" class="fas fa-clock mr-4 pulse"></i>
+                <span id="timer" class="russo-one">00:00:00</span>
+            </div>
+            <button id="submitButton" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl transition duration-300 ease-in-out transform hover:scale-105">
+                Submit Exam
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal for messages -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 overflow-y-auto h-full w-full hidden">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-3xl glassmorphism">
+            <div class="mt-3 text-center">
+                <h3 class="text-2xl leading-6 font-bold text-blue-400 russo-one" id="modalTitle"></h3>
+                <div class="mt-4 px-7 py-3">
+                    <p class="text-lg text-gray-300" id="modalMessage"></p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="modalClose" class="px-6 py-3 bg-blue-600 text-white text-lg font-medium rounded-full w-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='examprocess.js') }}"></script>
+</body>
+</html>

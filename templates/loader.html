@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading Screen</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    /* Base styles */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* Claymorphism effect on logo */
+    .logo-clay {
+      background: linear-gradient(145deg, #1c1e22, #1a1c1f);
+      box-shadow: 12px 12px 22px #0d0e10, -12px -12px 22px #23252a;
+      border-radius: 9999px;
+      padding: 2rem;
+    }
+
+    /* Pulsating glow effect for the logo */
+    @keyframes pulsate {
+      0% {
+        box-shadow: 0 0 20px rgba(111, 141, 249, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 30px rgba(111, 141, 249, 1);
+      }
+      100% {
+        box-shadow: 0 0 20px rgba(111, 141, 249, 0.7);
+      }
+    }
+
+    /* Progress bar animation */
+    .progress-bar {
+      width: 0%;
+      transition: width 0.3s ease-in-out;
+    }
+
+    /* Gradient glow animation */
+    @keyframes glow {
+      0% {
+        background-color: #2AA5F2;
+        box-shadow: 0 0 10px #2AA5F2;
+      }
+      50% {
+        background-color: #42C1FF;
+        box-shadow: 0 0 30px #42C1FF;
+      }
+      100% {
+        background-color: #2AA5F2;
+        box-shadow: 0 0 10px #2AA5F2;
+      }
+    }
+    
+    /* Dark overlay on the background */
+    .background-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: -1;
+    }
+
+    /* Centering and styling text */
+    .loading-text {
+      font-size: 1.2rem;
+      color: #f0f4f8;
+      text-align: center;
+    }
+
+    /* Typing animation for loading text */
+    .typing {
+      width: 22ch;
+      animation: typing 2s steps(22), blink .5s step-end infinite alternate;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid;
+    }
+
+    @keyframes typing {
+      from {
+        width: 0
+      }
+    }
+    
+    @keyframes blink {
+      50% {
+        border-color: transparent
+      }
+    }
+
+    /* Particle animation */
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      width: 5px;
+      height: 5px;
+      background-color: #fff;
+      box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      animation: rise 10s infinite ease-in;
+    }
+
+    @keyframes rise {
+      0% {
+        opacity: 0;
+        transform: translateY(0) scale(1);
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-1000px) scale(0.5);
+      }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-black relative">
+  
+  <!-- Dark Background with Overlay -->
+  <img src="../static/img/assets/darkbackground.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover z-0">
+  <div class="background-overlay"></div>
+
+  <!-- Particles -->
+  <div class="particles"></div>
+
+  <!-- Container for the loading screen -->
+  <div class="relative flex flex-col items-center justify-center space-y-6 z-10">
+    <!-- Logo with Claymorphism effect and pulsating glow -->
+    <div class="logo-clay animate-pulse" style="animation: pulsate 2s infinite;">
+      <img src="../static/img/assets/royal.jpg" alt="Logo" class="w-28 h-28 rounded-full">
+    </div>
+    
+    <!-- Loading bar with gradient animation -->
+    <div class="w-64 h-2 bg-gray-700 rounded-full overflow-hidden mt-4">
+      <div class="progress-bar bg-blue-500 h-full rounded-full"></div>
+    </div>
+    
+    <!-- Loading text -->
+    <p class="loading-text typing">Welcome to Royal Rangers...</p>
+  </div>
+
+  <script>
+    // Get the progress bar element
+    const progressBar = document.querySelector('.progress-bar');
+
+    // Set the initial width of the progress bar
+    let width = 0;
+
+    // Function to animate the progress bar
+    function animateProgressBar() {
+      width += 1;
+      progressBar.style.width = width + '%';
+
+      // If the progress bar is not yet full, continue animating
+      if (width < 100) {
+        setTimeout(animateProgressBar, 60);
+      } else {
+        // Redirect to Dialogue1.html when the progress bar reaches 100%
+        window.location.href = "{{ url_for('dialogue1') }}";
+      }
+    }
+
+    // Start animating the progress bar
+    animateProgressBar();
+
+    // Create particles
+    const particlesContainer = document.querySelector('.particles');
+    const particleCount = 50;
+
+    for (let i = 0; i < particleCount; i++) {
+      createParticle();
+    }
+
+    function createParticle() {
+      const particle = document.createElement('span');
+      particle.classList.add('particle');
+      
+      const size = Math.random() * 5 + 5;
+      particle.style.width = `${size}px`;
+      particle.style.height = `${size}px`;
+      
+      particle.style.left = `${Math.random() * 100}%`;
+      particle.style.top = `${Math.random() * 100}%`;
+      
+      particle.style.animationDuration = `${Math.random() * 5 + 5}s`;
+      particle.style.animationDelay = `${Math.random() * 5}s`;
+      
+      particlesContainer.appendChild(particle);
+      
+      setTimeout(() => {
+        particle.remove();
+        createParticle();
+      }, 10000);
+    }
+  </script>
+</body>
+</html>

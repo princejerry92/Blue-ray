@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Subject</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1f2937, #111827); /* Dark mode background */
+            color: #e5e7eb;
+        }
+
+        /* Claymorphism effect for form */
+        .glass-card {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            box-shadow: 10px 10px 30px #0e0f10, -10px -10px 30px #2a2f36;
+            border-radius: 20px;
+        }
+ 
+        /* Keyframe animation for icons */
+        @keyframes write {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(5px) rotate(2deg); }
+            75% { transform: translateX(-5px) rotate(-2deg); }
+        }
+
+        .animate-write {
+            animation: write 3s infinite ease-in-out;
+        }
+
+        /* Smooth input field focus animation */
+        input:focus {
+            transition: box-shadow 0.3s ease-in-out;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Button hover effects */
+        .btn-hover {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 h-screen flex items-center justify-center">
+    <div class="glass-card rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+        <div class="bg-teal-600 p-6 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-white">Set Subject</h2>
+            <div class="text-white text-3xl animate-write">
+                <i class="fas fa-pen-fancy"></i>
+                <i class="fas fa-file-alt ml-2"></i>
+            </div>
+        </div>
+        <div class="p-6 space-y-6">
+            <div>
+                <label for="subject" class="block text-sm font-medium text-gray-300 mb-1">Subject</label>
+                <div class="relative">
+                    <input type="text" id="subject" name="subject" class="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 sm:text-sm" placeholder="Enter subject name">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-book text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="question-length" class="block text-sm font-medium text-gray-300 mb-1">Number of Questions</label>
+                <div class="relative">
+                    <input type="number" id="question-length" name="question-length" min="1" class="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 sm:text-sm" placeholder="Enter number of questions">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-list-ol text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="question-template" class="block text-sm font-medium text-gray-300 mb-1">Question Template</label>
+                <div class="relative">
+                    <input type="file" id="question-template" name="question-template" class="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 sm:text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-file-upload text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <label for="answer-template" class="block text-sm font-medium text-gray-300 mb-1">Answer Template</label>
+                <div class="relative">
+                    <input type="file" id="answer-template" name="answer-template" class="block w-full pl-10 pr-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-teal-600 sm:text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-file-upload text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <button id="resetBtn" type="button" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-teal-600 bg-teal-100 hover:bg-teal-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                    <i class="fas fa-undo-alt mr-2"></i>
+                    Reset
+                </button>
+                <button id="saveSubjectBtn" type="button" class="btn-hover inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Save Subject
+                </button>
+            </div>
+            <div>
+                <label for="pdf-only" class="block text-sm font-medium text-gray-300">Check here if your Question contains Images.
+                    <span>
+                        <input type="checkbox" id="contains-images" name="image_pdf" class="rounded border-gray-300 text-teal-600 focus:ring-teal-600">
+                    </span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='subject.js') }}"></script>
+</body>
+</html>

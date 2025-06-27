@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Result Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #1f2937, #111827); /* Dark mode */
+            color: #e5e7eb; /* Light text for contrast */
+        }
+
+        /* Claymorphism effect */
+        .glass-effect {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            box-shadow: 10px 10px 30px #0e0f10, -10px -10px 30px #2a2f36;
+            border-radius: 20px;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Pulse animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(111, 141, 249, 0.5);
+            }
+            70% {
+                box-shadow: 0 0 0 20px rgba(111, 141, 249, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(111, 141, 249, 0);
+            }
+        }
+
+        /* Smooth card entrance */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-effect {
+            animation: fadeIn 1s ease-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="glass-effect p-8 w-full max-w-md hover-scale">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-white mb-2">Student Dashboard</h1>
+            <p class="text-gray-400">Exam Results</p>
+        </div>
+
+        <!-- Profile Video -->
+        <div class="flex items-center justify-center mb-8">
+            <div class="rounded-full overflow-hidden pulse" style="width: 150px; height: 150px;">
+                <video width="100%" height="100%" class="object-cover" muted loop autoplay>
+                    <source src="../static/img/assets/Animation - 1725471203790.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </div>
+
+        <!-- Student Details -->
+        <div class="space-y-4">
+            <!-- Name & Exam Number -->
+            <div class="flex items-center space-x-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <i class="fas fa-user-graduate text-2xl text-gray-300"></i>
+                <div>
+                    <h2 class="text-xl font-semibold text-white" id="studentName">Loading...</h2>
+                    <p class="text-gray-400 text-sm" id="examNumber">Loading...</p>
+                </div>
+            </div>
+
+            <!-- Class & Subject -->
+            <div class="flex items-center space-x-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <i class="fas fa-chalkboard-teacher text-2xl text-gray-300"></i>
+                <div>
+                    <p class="text-gray-300"><span class="font-semibold">Class:</span> <span id="studentClass">Loading...</span></p>
+                    <p class="text-gray-300"><span class="font-semibold">Subject:</span> <span id="studentSubject">Loading...</span></p>
+                </div>
+            </div>
+
+            <!-- Score -->
+            <div class="flex items-center space-x-4 bg-white bg-opacity-10 rounded-lg p-4">
+                <i class="fas fa-trophy text-2xl text-gray-300"></i>
+                <div>
+                    <p class="text-white font-semibold">Score:</p>
+                    <p class="text-2xl font-bold text-white" id="studentScore">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='profile.js') }}"></script>
+
+</body>
+</html>

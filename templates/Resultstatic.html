@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at 50%, #1f2937, #111827); /* Dark mode background */
+            color: #e5e7eb;
+        }
+
+        /* Claymorphism effect */
+        .glass-effect {
+            background: linear-gradient(145deg, #1f2937, #111827);
+            box-shadow: 10px 10px 30px #0e0f10, -10px -10px 30px #2a2f36;
+            border-radius: 12px;
+        }
+
+        /* Hover animations for download links */
+        .download-link:hover {
+            transform: translateX(10px);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Button hover effects */
+        .btn-hover {
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn-hover:hover {
+            background-color: #10b981;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-2xl mx-auto p-8 glass-effect">
+        <h1 class="text-4xl font-bold text-center mb-8">Results Files From Server</h1>
+        <ul class="space-y-4">
+            {% for file in files %}
+                <li class="text-lg">
+                    <a href="{{ url_for('list_results', filename=file) }}" class="download-link text-blue-400 hover:text-orange-500 font-semibold">
+                        <i class="fas fa-file-download mr-2"></i>{{ file }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+</html>

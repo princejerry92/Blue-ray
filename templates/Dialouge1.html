@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dialog Box</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Lexend Deca', sans-serif;
+      background-color: #1f2937; /* Dark mode */
+      color: #e5e7eb; /* Text color */
+    }
+
+    /* Claymorphism effect for dialog box */
+    #dialogue-container {
+      background: linear-gradient(145deg, #2a3746, #111827);
+      box-shadow: 10px 10px 20px #0d0f12, -10px -10px 20px #2a3746;
+      border-radius: 12px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 12px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0px 5px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+      box-shadow: 0px 5px 20px rgba(59, 130, 246, 0.7);
+    }
+
+    .btn-secondary {
+      background-color: #e5e7eb;
+      color: #4b5563;
+      padding: 10px 20px;
+      border-radius: 12px;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background-color: #d1d5db;
+    }
+
+    /* Keyframe animation for modal fade-in */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Modal animation */
+    #dialogue-container {
+      animation: fadeIn 0.5s ease-out;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+
+  <div class="p-8 rounded-lg shadow-lg max-w-lg w-full" id="dialogue-container">
+    <div class="bg-gray-800 p-8 rounded-lg shadow-md text-center">
+      <p class="text-gray-200 mb-6">This Software will make changes on your computer’s file system. If you already have the necessary file structure, you can skip this step.</p>
+      <div class="flex justify-center space-x-4">
+        <a href="{{ url_for('render_class_folder') }}">
+          <button class="btn-primary">OK</button>
+        </a>
+        <a href="{{ url_for('welcome_screen') }}">
+          <button class="btn-secondary">Skip This</button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

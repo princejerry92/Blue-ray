@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .sidebar {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .content-area {
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(234, 179, 8, 0.2);
+            transform: translateX(5px);
+        }
+
+        .file-icon {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .file-icon:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ... (keep other existing styles) ... */
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: -150px;
+            top: 0;
+            background-color: white;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            z-index: 1;
+            width: 150px;
+        }
+        .dropdown.show {
+            display: block;
+        }
+        .dropdown a {
+            color: black;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            white-space: nowrap;
+        }
+        .dropdown a:hover {
+            background-color: #a16d24;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgb(5, 24, 44);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            animation: slideIn 0.5s ease-out;
+        }
+        .modal-icon {
+            font-size: 50px;
+            color: green;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        .file-icon.selected {
+            box-shadow: 0 0 0 2px #4933f0;
+            border-radius: 4px;
+        }
+        .file-icon:focus {
+            box-shadow: 0 0 0 2px #4933f0;
+            border-radius: 4px;
+        }
+        #dialogueMessage{
+            color: grey;
+        }
+       
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    }
+    </style>
+</head>
+<body class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 p-6 space-y-6">
+        <div class="flex items-center space-x-4">
+            <img src="../static/img/assets/royal.jpg" alt="Logo" class="w-12 h-12 rounded-full border-2 border-yellow-500">
+            <h1 class="text-2xl font-bold text-yellow-500">Admin 1</h1>
+        </div>
+        <nav class="space-y-4">
+            <a href="{{ url_for('home') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <i class="fas fa-dashboard text-yellow-500"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('Admin1') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <i class="fas fa-file-alt text-yellow-500"></i>
+                <span>Question Template</span>
+            </a>
+            <a href="{{ url_for('resultPortal') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <i class="fas fa-chart-bar text-yellow-500"></i>
+                <span>Results</span>
+            </a>
+            <a href="{{ url_for('connect_scan') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <i class="fas fa-network-wired text-yellow-500"></i>
+                <span>Connections</span>
+            </a>
+            <a href="{{ url_for('Autofile') }}" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <span class="material-symbols-outlined text-yellow-500">cloud_upload</span>
+                <span>Autofile Transfer</span>
+            </a>
+            <a href="#" class="nav-link flex items-center space-x-3 p-3 rounded-lg">
+                <i class="fas fa-history text-yellow-500"></i>
+                <span>Logger</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Navbar -->
+        <header class="bg-gray-800 text-white p-4">
+            <nav class="flex space-x-6">
+                <a href="#" class="hover:text-yellow-500 transition duration-300">Home</a>
+                <a href="#" class="hover:text-yellow-500 transition duration-300">Guide</a>
+                <a href="#" class="hover:text-yellow-500 transition duration-300">Settings</a>
+                <a href="#" class="hover:text-yellow-500 transition duration-300">Ping</a>
+                <a href="#" class="hover:text-yellow-500 transition duration-300">File manager</a>
+            </nav>
+        </header>
+
+        <!-- Content area -->
+        <main class="content-area flex-1 overflow-x-hidden overflow-y-auto p-6">
+            <div class="grid grid-cols-3 gap-6">
+                <!-- File icons container -->
+                <div id="fileIconsContainer" class="col-span-2 grid grid-cols-3 gap-6">
+                    <!-- Dynamically generated file icons will go here -->
+                </div>
+            
+                <!-- Add new button -->
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-6 flex items-center justify-center">
+                    <button id="addNewBtn" class="text-yellow-500 hover:text-yellow-600 transition duration-300">
+                        <i class="fas fa-plus text-4xl mb-2"></i>
+                        <span class="block">Add new</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add New File Modal -->
+    <div id="addNewModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content max-w-md w-full p-6 rounded-lg">
+            <h2 class="text-2xl font-bold mb-6 text-yellow-500">Add New File</h2>
+            <form id="addNewForm" class="space-y-6">
+                <div>
+                    <label for="fileName" class="block text-sm font-medium text-gray-300">File Name</label>
+                    <input type="text" id="fileName" name="fileName" required class="mt-1 block w-full rounded-md bg-gray-700 border-gray-600 text-white focus:border-yellow-500 focus:ring focus:ring-yellow-500 focus:ring-opacity-50">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-white">Subdirectory</label>
+                    <div class="mt-2 space-y-2">
+                        <label class="inline-flex items-center"><input type="radio" name="subdirectory" value="Class" required class="form-radio text-yellow-500"><span class="ml-2 text-gray-100">Class</span></label>
+                        <label class="inline-flex items-center"><input type="radio" name="subdirectory" value="Results" required class="form-radio text-yellow-500"><span class="ml-2 text-gray-100">Results</span></label>
+                        <label class="inline-flex items-center"><input type="radio" name="subdirectory" value="Questions" required class="form-radio text-yellow-500"><span class="ml-2 text-gray-100">Questions</span></label>
+                        <label class="inline-flex items-center"><input type="radio" name="subdirectory" value="Passwords" required class="form-radio text-yellow-500"><span class="ml-2 text-gray-100">Passwords</span></label>
+                        <label class="inline-flex items-center"><input type="radio" name="subdirectory" value="Logger" required class="form-radio text-yellow-500"><span class="ml-2 text-gray-100">Logger</span></label>
+                    </div>
+                </div>
+                <div>
+                    <label for="fileUpload" class="block text-sm font-medium text-gray-300">Upload Document</label>
+                    <input type="file" id="fileUpload" name="fileUpload" required class="mt-1 block w-full text-gray-300">
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <button type="button" id="cancelBtn" class="btn px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Cancel</button>
+                    <button type="submit" class="btn px-4 py-2 bg-yellow-500 text-gray-900 rounded hover:bg-yellow-600">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content max-w-md w-full p-6 rounded-lg text-center">
+            <span class="close text-gray-400 text-2xl">&times;</span>
+            <div class="modal-icon text-6xl text-green-500 mb-4">&#10004;</div>
+            <h2 class="text-2xl font-bold mb-2 text-yellow-500">Success!</h2>
+            <p class="text-gray-300">File upload was successful.</p>
+        </div>
+    </div>
+
+    <!-- Dialogue Modal -->
+    <div id="dialogueModal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+        <div class="modal-content max-w-md w-full p-6 rounded-lg">
+            <h2 class="text-2xl font-bold mb-4 text-yellow-500">Message</h2>
+            <div id="dialogueMessage" class="text-gray-300 text-center mb-6">
+                <!-- JSON Messages will be displayed here -->
+            </div>
+            <div class="flex justify-end">
+                <button type="button" id="dialogueCloseBtn" class="btn px-4 py-2 bg-yellow-500 text-gray-900 rounded hover:bg-yellow-600">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='upload2.js') }}"></script>
+    <script>
+        // Add some animations and interactivity
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('mouseenter', () => {
+                link.style.transform = 'translateX(10px)';
+            });
+            link.addEventListener('mouseleave', () => {
+                link.style.transform = 'translateX(0)';
+            });
+        });
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Young Scribe - Owly</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: url('../static/img/assets/darkbackground.jpg') no-repeat center center / cover;
+
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center">
+    <div class="relative w-full max-w-2xl bg-gradient-to-br from-gray-900 to-black rounded-3xl shadow-2xl overflow-hidden p-8">
+        <!-- Background shapes -->
+        <div class="absolute top-4 left-4 w-16 h-16 bg-gray-800 rounded-full"></div>
+        <div class="absolute top-8 right-8 w-24 h-24 border-4 border-yellow-500 rounded-full opacity-50"></div>
+        <div class="absolute bottom-4 left-1/4 w-12 h-12 bg-gray-800 transform rotate-45"></div>
+        <div class="absolute bottom-8 right-1/4 w-16 h-2 bg-yellow-600 rounded-full"></div>
+        
+        <div class="relative z-10">
+            <h1 class="text-3xl font-bold mb-6">Hey Young Scribe My Name is Owly</h1>
+            
+            <!-- Modified Form -->
+            <form class="space-y-4 w-3/5" id="studentForm">
+                <div>
+                    <label class="block mb-1 text-sm" for="name">What is your Name</label>
+                    <input type="text" id="name" name="name" class="w-full bg-gray-800 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                </div>
+                
+                <div>
+                    <label class="block mb-1 text-sm" for="class">Please select your Class</label>
+                    <select id="class" name="class" class="w-full bg-gray-800 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none" required>
+                        <option value="">Select one</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block mb-1 text-sm" for="subject">What subject are you writing?</label>
+                    <input type="text" id="subject" name="subject" class="w-full bg-gray-800 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                </div>
+                
+                <div>
+                    <label class="block mb-1 text-sm" for="exam_number">What is your exam number</label>
+                    <input type="text" id="exam_number" name="exam_number" class="w-full bg-gray-800 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-500" required>
+                </div>
+                
+                <button type="submit" class="w-3/4 ml-8 mt-4 bg-orange-500 text-white rounded-md py-2 px-4 flex items-center justify-center space-x-2 hover:bg-orange-600 transition duration-300">
+                    <span>Enter</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                
+            </form>
+        </div>
+        
+        <!-- Owly character -->
+        <img src="../static/img/assets/OIG4__1_-removebg-preview.png" alt="Owly" class="absolute bottom-4 right-4 w-60 h-60">
+    </div>
+    
+    <script>
+        const form = document.getElementById('studentForm');
+        const modal = document.createElement('div');
+        modal.classList.add('fixed', 'inset-0', 'flex', 'items-center', 'justify-center', 'z-50', 'bg-black', 'bg-opacity-50');
+        
+        const modalContent = document.createElement('div');
+        modalContent.classList.add('bg-white', 'p-6', 'rounded-md', 'shadow-md');
+        modalContent.style.color = 'black';
+        
+        const modalTitle = document.createElement('h2');
+        modalTitle.classList.add('text-xl', 'font-bold', 'mb-4');
+        modalTitle.textContent = 'Submission Status';
+        
+        const modalMessage = document.createElement('p');
+        modalMessage.classList.add('mb-4');
+        
+        modalContent.appendChild(modalTitle);
+        modalContent.appendChild(modalMessage);
+        modal.appendChild(modalContent);
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/student', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    modalTitle.textContent = 'Registration Successful 😊';
+                    modalMessage.textContent = 'Signing you in...';
+                    document.body.appendChild(modal);
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("main_display") }}';
+
+                    }, 2000);
+                } else {
+                    const errorData = await response.json();
+                    modalTitle.textContent = 'Registration Failed 😔';
+                    modalMessage.textContent = errorData.error || 'An error occurred during registration.';
+                    document.body.appendChild(modal);
+                }
+            } catch (error) {
+                console.error('Error during form submission:', error);
+                modalTitle.textContent = 'Error 😔';
+                modalMessage.textContent = 'An unexpected error occurred.';
+                document.body.appendChild(modal);
+            }
+        });
+
+        // Populate the select dropdown for class options
+        const classSelect = document.getElementById('class');
+        const classes = ['JSS1', 'JSS2', 'JSS3', 'SS1', 'SS2', 'SS3'];
+
+        classes.forEach(className => {
+            const option = document.createElement('option');
+            option.value = className;
+            option.textContent = className;
+            classSelect.appendChild(option);
+        });
+    </script>
+</body>
+</html>

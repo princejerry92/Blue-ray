@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futuristic Examloader</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&display=swap');
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: #000000;
+            color: #00ffff;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            height: 100vh;
+            perspective: 1000px;
+        }
+
+        .loader {
+            width: 100px;
+            height: 100px;
+            border: 5px solid #00ffff;
+            border-top: 5px solid #0000ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite, pulse 2s ease-in-out infinite;
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff, 0 0 60px #00ffff;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .center-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(0);
+            text-align: center;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) translateZ(0); }
+            50% { transform: translate(-50%, -60%) translateZ(50px); }
+        }
+
+        #errorMessage {
+            display: none;
+            color: #ff0000;
+            font-weight: bold;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: rgba(255, 0, 0, 0.1);
+            border-radius: 0.5rem;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
+        #statusMessages {
+            color: #00ffff;
+            margin-top: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .status-item {
+            opacity: 0;
+            transform: translateY(20px) rotateX(45deg);
+            transition: opacity 0.5s, transform 0.5s;
+        }
+
+        .status-item.show {
+            opacity: 1;
+            transform: translateY(0) rotateX(0deg);
+        }
+
+        .progress-bar {
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #0000ff, #00ffff);
+            position: fixed;
+            top: 0;
+            left: 0;
+            transition: width 0.5s ease-out;
+            box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+        }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, #000033 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, #000066 0%, transparent 50%);
+            opacity: 0.5;
+            z-index: -1;
+        }
+
+        .grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            animation: grid-move 20s linear infinite;
+        }
+
+        @keyframes grid-move {
+            0% { transform: translateZ(0px); }
+            100% { transform: translateZ(1000px); }
+        }
+    </style>
+</head>
+<body class="bg-black">
+    <div class="container">
+        <div class="background"></div>
+        <div class="grid"></div>
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="center-loader">
+            <div class="loader mb-8"></div>
+            <div id="statusMessages" class="space-y-4"></div>
+            <div id="errorMessage" class="hidden"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const statusMessages = document.getElementById('statusMessages');
+            const errorMessage = document.getElementById('errorMessage');
+            const progressBar = document.getElementById('progressBar');
+
+            async function callExtractor() {
+                try {
+                    const response = await fetch('/extractor', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Server responded with an error');
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    throw new Error(`Error calling extractor: ${error.message}`);
+                }
+            }
+
+            async function updateStatus(message, delay) {
+                const statusItem = document.createElement('div');
+                statusItem.textContent = message;
+                statusItem.classList.add('status-item');
+                statusMessages.appendChild(statusItem);
+
+                await new Promise(resolve => setTimeout(() => {
+                    statusItem.classList.add('show');
+                    resolve();
+                }, 100));
+
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+
+            async function updateProgressBar(progress) {
+                progressBar.style.width = `${progress}%`;
+            }
+
+            async function loadingProcess() {
+                try {
+                    await updateStatus("Initializing exam loading process...", 2000);
+                    updateProgressBar(20);
+
+                    await updateStatus("Attempting to Extract question template ...", 3000);
+                    updateProgressBar(40);
+
+                    await updateStatus("Attempting to Extract answer template ...", 3000);
+                    updateProgressBar(60);
+
+                    await callExtractor();
+                    await updateStatus("Templates successfully extracted ", 2000);
+                    updateProgressBar(80);
+
+                    await updateStatus("Calibrating  interface for student login...", 2000);
+                    updateProgressBar(100);
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    window.location.href = '{{ url_for("stlogin") }}';
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    errorMessage.style.display = 'block';
+                    errorMessage.innerHTML = `
+                        <p class="mb-4">An Error Occured Ensure that you used the correct file format ie pdf for images , Msword for normal text and .txt for The Answer Templates,see guide for more details: ${error.message}</p>
+                        <button onclick="location.reload()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2">
+                            Recalibrate System
+                        </button>
+                        <button onclick="window.location.href='/Admin2'" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Return to Admin dashboard
+                        </button>
+                    `;
+                }
+            }
+
+            loadingProcess();
+        });
+    </script>
+</body>
+</html>

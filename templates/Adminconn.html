@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-700 text-white p-4">
+            <div class="flex items-center mb-6">
+                <img src="path_to_logo.png" alt="Logo" class="w-10 h-10 mr-2 rounded-full">
+                <h1 class="text-xl font-bold">Admin 1</h1>
+            </div>
+            <nav>
+                <a href="#" class="block py-2 px-4 hover:bg-orange-500 rounded transition duration-200 flex items-center">
+                    <i class="fas fa-file-alt mr-2"></i> Question Template
+                </a>
+                <a href="#" class="block py-2 px-4 hover:bg-orange-500 rounded transition duration-200 flex items-center">
+                    <i class="fas fa-chart-bar mr-2"></i> Results
+                </a>
+                <a href="#" class="block py-2 px-4 hover:bg-orange-500 rounded transition duration-200 flex items-center">
+                    <i class="fas fa-network-wired mr-2"></i> Connections
+                </a>
+                <a href="#" class="block py-2 px-4 hover:bg-orange-500 rounded transition duration-200 flex items-center">
+                    <i class="fas fa-history mr-2"></i> Logger
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Navbar -->
+            <header class="bg-gray-600 text-white">
+                <div class="flex items-center justify-between px-6 py-3">
+                    <nav class="flex space-x-4">
+                        <a href="#" class="hover:text-orange-500">Home</a>
+                        <a href="#" class="hover:text-orange-500">Guide</a>
+                        <a href="#" class="hover:text-orange-500">Settings</a>
+                        <a href="#" class="hover:text-orange-500">Ping</a>
+                        <a href="#" class="hover:text-orange-500">File manager</a>
+                    </nav>
+                </div>
+            </header>
+
+            <!-- Content area -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-200 p-6">
+                <div class="mb-4">
+                    <div class="bg-white rounded-lg shadow p-4 inline-block">
+                        <div class="flex items-center">
+                            <i class="fas fa-network-wired text-gray-600 mr-2"></i>
+                            <span class="font-semibold">Connected Devices</span>
+                            <span class="ml-2 text-green-500">12</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-500 text-white rounded-lg shadow px-4 py-2 inline-block ml-4">
+                        <span>Connected</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center items-center">
+                    <div class="relative">
+                        <!-- Main device -->
+                        <div class="bg-white border-2 border-green-500 rounded-lg p-4 mb-4">
+                            <i class="fas fa-desktop text-4xl"></i>
+                            <div class="text-lg font-bold">Admin 1</div>
+                        </div>
+                        
+                        <!-- Connected devices -->
+                        <div class="flex justify-between w-96">
+                            <div class="bg-white border-2 border-green-500 rounded-lg p-2">
+                                <i class="fas fa-desktop text-2xl"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Lines connecting devices -->
+                        <div class="absolute top-16 left-1/2 w-px h-8 bg-gray-400 transform -translate-x-1/2"></div>
+                        <div class="absolute top-24 left-1/4 w-px h-8 bg-gray-400 transform -translate-x-1/2"></div>
+                        <div class="absolute top-24 left-1/2 w-px h-8 bg-gray-400 transform -translate-x-1/2"></div>
+                        <div class="absolute top-24 left-3/4 w-px h-8 bg-gray-400 transform -translate-x-1/2"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
